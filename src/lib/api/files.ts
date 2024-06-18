@@ -8,24 +8,23 @@ export async function uploadFiles(dataFile: File, refFile: File, dataType: strin
   formData.append('refer', refFile);
   formData.append('type', dataType);
 
-  console.log(dataType);
 
   const access_token = localStorage.getItem("token");
-  
+
   try {
     const res = (await axios.post(`${SERVER}/api/excel/upload`, formData,
-  
+
       {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${access_token}`
         }
       }));
-    
-    return res.data.files;
-    
 
-    
+    return res.data.files;
+
+
+
   } catch (error) {
     alert('오류가 발생했습니다. 다시 시도해 주세요.');
   }
