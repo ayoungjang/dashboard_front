@@ -1,4 +1,4 @@
-import { postApi } from "./api.ts";
+
 import axios from 'axios';
 import { SERVER } from "$lib/value";
 
@@ -26,7 +26,7 @@ export async function uploadFiles(dataFile: File, refFile: File, dataType: strin
 
 
   } catch (error) {
-    alert('오류가 발생했습니다. 다시 시도해 주세요.');
+    alert('error');
   }
 
 
