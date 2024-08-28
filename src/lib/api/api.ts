@@ -1,5 +1,6 @@
 import axios from "axios";
 import { SERVER } from "$lib/value";
+import { goto } from '$app/navigation';
 
 const send = async ({ method = '', path = '', data = {}, access_token = '' } = {}) => {
   const commonUrl = SERVER
@@ -27,11 +28,13 @@ const send = async ({ method = '', path = '', data = {}, access_token = '' } = {
     return response.data
   }
   catch (error) {
+    goto('/login');  // go home
     throw error
   }
 }
 
 const getApi = ({ path = '', access_token = '' } = {}) => {
+  
   return send({ method: 'GET', path, access_token })
 }
 

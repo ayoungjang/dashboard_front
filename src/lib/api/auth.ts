@@ -1,4 +1,4 @@
-import { postApi } from "$lib/api/api";
+import { getApi, postApi } from "$lib/api/api";
 import { goto } from '$app/navigation';
 import { setToken } from "$lib/store/auth";
 // import { setToken } from '$lib/store/auth';
@@ -50,21 +50,31 @@ export async function login(id: string, pw: string) {
 }
 
 
-export async function tokenLogin(id: string, pw: string) {
-  // try {
-  //   const response = await axios.post(`${SERVER}/user/token`, {
-  //     headers: {
-  //       Authorization:`Bearer ${token}`
-  //     }
-  //   });
+export async function tokenLogin() {
+  const savedToken = localStorage.getItem('token');
 
-  //   const res = response.data;
-  //   console.log(res);
+  if (savedToken == null || "") {
+    goto('/login');  // go home
+    return;
+  }
 
-  //   return res;
-  // } catch (e) {
-  //   console.error('Error during login:', e);
-  //   throw e; 
-  // }
+  try {
+    const options = {
+      path: '/api/user/token',
+      access_token: savedToken
+    };
+
+    const response = await getApi(options);
+
+    if (response.access_token) {
+      setToken(response.access_token)
+      goto('/');  // go home
+    } else {
+      throw new Error('No token in response');
+    }
+  } catch (error) {
+    alert('error');
+    console.error('Login error:', error);
+  }
 }
 
