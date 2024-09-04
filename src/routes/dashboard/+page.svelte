@@ -9,19 +9,21 @@
 
 	let dataFile: File | null = null;
 	let refFile: File | null = null;
-	let dataType: string = 'strip'; // Default to 'Disk'
+	let dataType: string = 'Disk'; // Default to 'Disk'
 	let antiType: string = '';
 	let errorMsg: string = '';
 
-	let plotFiles: { path: string; name: string }[] = [];
+	let plotFiles: { name: string }[] = [];
 	let selectedPlot: string = ''; //TODO
 	let isLoading: boolean = false;
 	let dir: string = ''; //TODO
 	var chart: any | null = null;
-	plotFiles = [{ path: '', name: 'E-test' }]; //TODO
-	selectedPlot = 'E-test';
+	// plotFiles = [{ name: 'E-test' }, { name: 'MTS' }]; //TODO
+	// selectedPlot = 'E-test';
 	antiType = 'linezolid10';
-	dir = '20240904212059'; //TODO
+	dir = '20240904213141'; //TODO
+	plotFiles = [{ name: 'BD' }, { name: 'Oxoid' }, { name: 'Mast' }]; //TODO
+	selectedPlot = 'Oxoid';
 	onMount(() => {
 		chart = Chart.getChart('myChart');
 		if (chart) chart.destroy();
