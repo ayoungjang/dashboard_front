@@ -2,8 +2,6 @@ import Chart from 'chart.js/auto';
 
 export default function StripChart(data, chart) {
 	const ctx = document.getElementById('myChart').getContext('2d');
-	if (chart) chart.destroy(); //if chart is already existed, destroy
-	const n = data.length;
 
 	// Species labels based on the logic in the R code
 	const speciesLabels = data.map((item,idx) =>
@@ -120,7 +118,7 @@ chart = new Chart(ctx, {
 						const idx = data.findIndex((i)=> i.Strain_no == tick.value);
 						if(idx>-1){
 							const target = data[idx];
-							tick.label = target.Species == '1' ? `${target.Strain_no} faecalis` : `${target.Strain_no} faecium`;
+							tick.label = target.Species == '1' ? `${target.Strain_no} faecalis(n=${target.count})` : `${target.Strain_no} faecium(n=${target.count})`;
 
 						}
 						return; 

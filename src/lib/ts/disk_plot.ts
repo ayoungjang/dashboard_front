@@ -1,13 +1,13 @@
 import Chart from 'chart.js/auto';
 
-export default function (chartData: Array, chart: any, strainNumbers: string[]) {
+export default function (chartData: Array, chart: any) {
 	const ctx = document.getElementById('myChart').getContext('2d');
-	if (chart) chart.destroy(); //if chart is already existed, destroy
+
 	chartData = chartData.filter((item) => {
 		return item.EDL !== undefined && item.K_res !==undefined;
 	});
 
-	strainNumbers = chartData.map((item) => item.Strain_no);
+	const strainNumbers = chartData.map((item) => `${item.Strain_no}(n=${item.counts})`);
 
 	const d = 0.3; 
 
@@ -115,17 +115,22 @@ export default function (chartData: Array, chart: any, strainNumbers: string[]) 
 				},
 				y: {
 					reverse:true,
+					labels: strainNumbers,
 					max:strainNumbers.length,
 					min:1,
 					ticks: {
 						padding: 20,
 						stepSize: 1
 					},
+					afterTickToLabelConversion: function(scaleInstance) { 
+						scaleInstance.ticks.forEach((tick,idx )=> { 
+							tick.label = strainNumbers[idx];
+						});
+						},
 					// type: 'category',
-					labels: strainNumbers,
 					title: {
 						display: true,
-						text: 'Strain_no'
+						text: `Strain(n=${strainNumbers.length})`
 					},
 				}
 			},

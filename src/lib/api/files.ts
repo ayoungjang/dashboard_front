@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { SERVER } from "$lib/value";
 import { getApi } from './api';
+import { clearToken } from '$lib/store/auth';
 
 export async function uploadFiles(dataFile: File, refFile: File, dataType: string) {
   const formData = new FormData();
@@ -36,19 +37,26 @@ export async function uploadFiles(dataFile: File, refFile: File, dataType: strin
 
 
 
-export async function getData(type:string, timestamp:string, name:string) {
+export async function getData(type:string, timestamp:string, anti:string,name:string) {
   try {
     
   const token = localStorage.getItem("token");
-   const res = (await axios.get(`${SERVER}/api/excel/plots/${type}/${timestamp}/${name}`,{
+   const res = (await axios.get(`${SERVER}/api/excel/plots/${type}/${timestamp}/${anti}/${name}`,{
     headers:{
       Authorization : `Bearer ${token}`
     }
    })).data;
 
     return res;
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error');
+  } catch (error:Object) {
+    const status:Number = error.response.status;
+
+
+    if(status === 403){
+      alert("Non Authorization");
+      clearToken();
+      window.location.href="/login";
+    }
+    
   }
 }

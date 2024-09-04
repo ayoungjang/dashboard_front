@@ -5,36 +5,29 @@
 	import { onMount } from 'svelte';
 	import diskChart from '$lib/ts/disk_plot';
 	import StripChart from '$lib/ts/strip_plot';
+	import Chart from 'chart.js/auto';
 
 	let dataFile: File | null = null;
 	let refFile: File | null = null;
-	let dataType: string = 'Disk'; // Default to 'Disk'
+	let dataType: string = 'strip'; // Default to 'Disk'
+	let antiType: string = '';
 	let errorMsg: string = '';
-	let plotFiles: { path: string; name: string }[] = [
-		{
-			path: '',
-			name: 'Oxoid'
-		}
-	]; //TODO
-	let selectedPlot: string = 'Oxoid'; //TODO
-	let isLoading: boolean = false;
-	let dir: string = '20240827202738'; //TODO
-	let chart: any | null = null;
-	let strainNumbers: string[];
-	//TODO: test
-	onMount(async () => {
-		try {
-			const response = await getData(dataType, dir, selectedPlot);
-			if (dataType == 'Disk') diskChart(response, chart, strainNumbers);
-			else StripChart(response, chart);
-		} catch (error) {
-			console.error('Upload failed:', error);
-			errorMsg = 'File upload failed. Please try again.';
-		} finally {
-			isLoading = false;
-		}
-	});
 
+	let plotFiles: { path: string; name: string }[] = [];
+	let selectedPlot: string = ''; //TODO
+	let isLoading: boolean = false;
+	let dir: string = ''; //TODO
+	var chart: any | null = null;
+	plotFiles = [{ path: '', name: 'E-test' }]; //TODO
+	selectedPlot = 'E-test';
+	antiType = 'linezolid10';
+	dir = '20240904212059'; //TODO
+	onMount(() => {
+		chart = Chart.getChart('myChart');
+		if (chart) chart.destroy();
+
+		chgData();
+	});
 	function handleDataFileChange(event: Event) {
 		const target = event.target as HTMLInputElement;
 		if (target.files) {
@@ -58,6 +51,7 @@
 				const response = await uploadFiles(dataFile, refFile, dataType);
 				plotFiles = response;
 				dir = response[0].dir;
+				antiType = response[0].anti_type;
 				selectedPlot = '';
 			} catch (error) {
 				console.error('Upload failed:', error);
@@ -72,14 +66,20 @@
 	}
 
 	async function handleCheckboxChange(event: Event) {
+		chart = Chart.getChart('myChart');
+		if (chart) chart.destroy();
 		const target = event.target as HTMLInputElement;
 		if (target.checked) {
 			selectedPlot = target.value;
 		}
-		try {
-			const response = await getData(dataType, dir, selectedPlot);
+		chgData();
+	}
 
-			diskChart(response, chart, strainNumbers);
+	async function chgData() {
+		try {
+			const response = await getData(dataType, dir, antiType, selectedPlot);
+			if (dataType == 'Disk') diskChart(response, chart);
+			else StripChart(response, chart);
 		} catch (error) {
 			console.error('Upload failed:', error);
 			errorMsg = 'File upload failed. Please try again.';
@@ -87,7 +87,6 @@
 			isLoading = false;
 		}
 	}
-
 	function handleLogout() {
 		if (window.confirm('logout?')) {
 			clearToken();
@@ -128,6 +127,12 @@
 			<button on:click={handleSubmit} class="btn btn-primary">Submit</button>
 			{#if !isLoading}
 				<div class="mt-4">
+					{#if antiType}
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value={antiType} checked="true" />
+							<label class="form-check-label">{antiType}</label>
+						</div>
+					{/if}
 					<h4>Select Plot to View</h4>
 					{#each plotFiles as plotFile}
 						<div class="form-check">
