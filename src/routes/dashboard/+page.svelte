@@ -6,10 +6,10 @@
 	import diskChart from '$lib/ts/disk_plot';
 	import StripChart from '$lib/ts/strip_plot';
 	import Chart from 'chart.js/auto';
-
+	import '$lib/css/dashboard.css'
 	let dataFile: File | null = null;
 	let refFile: File | null = null;
-	let dataType: string = 'Disk'; // Default to 'Disk'
+	let dataType: string = 'Strip'; // Default to 'Disk'
 	let antiType: string = '';
 	let errorMsg: string = '';
 
@@ -18,12 +18,12 @@
 	let isLoading: boolean = false;
 	let dir: string = ''; //TODO
 	var chart: any | null = null;
-	// plotFiles = [{ name: 'E-test' }, { name: 'MTS' }]; //TODO
-	// selectedPlot = 'E-test';
+	plotFiles = [{ name: 'E-test' }, { name: 'MTS' }]; //TODO
+	selectedPlot = 'E-test';
 	antiType = 'linezolid10';
-	dir = '20240904213141'; //TODO
-	plotFiles = [{ name: 'BD' }, { name: 'Oxoid' }, { name: 'Mast' }]; //TODO
-	selectedPlot = 'Oxoid';
+	dir = '20240905120912'; //TODO
+	//plotFiles = [{ name: 'BD' }, { name: 'Oxoid' }, { name: 'Mast' }]; //TODO
+	//selectedPlot = 'Oxoid';
 	onMount(() => {
 		chart = Chart.getChart('myChart');
 		if (chart) chart.destroy();
@@ -96,11 +96,21 @@
 			goto('/login');
 		}
 	}
+
+	function downloadPlot(){
+		const image = Chart.getChart('myChart').toBase64Image();
+				
+                const link = document
+                    .createElement('a');
+                link.href = image;
+                link.download = `${dir}_${selectedPlot}_${antiType}.jpg`;
+                link.click();
+	}
 </script>
 
 <div class="mt-4 d-flex min-vh-100">
 	<div class="border-right p-5">
-		<button class="col-3 justify-content-end btn btn-danger mb-5" on:click={handleLogout}
+		<button class="col-5 justify-content-end btn btn-danger mb-5" on:click={handleLogout}
 			>Logout</button
 		>
 		<h1 class="mb-5">Oversikt</h1>
@@ -166,8 +176,11 @@
 		{#if selectedPlot}
 			<div class="mt-4 plot-container">
 				<h2>Plot for {selectedPlot}</h2>
+				<button class="col-3 justify-content-end btn btn-primary mb-5" on:click={downloadPlot}
+			>Download</button
+		>
 				<div class="chart-container">
-					<canvas id="myChart"></canvas>
+					<canvas id="myChart" ></canvas>
 				</div>
 			</div>
 		{/if}

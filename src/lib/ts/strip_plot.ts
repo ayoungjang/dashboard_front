@@ -1,7 +1,8 @@
 import Chart from 'chart.js/auto';
 
-export default function StripChart(data, chart) {
+export default function StripChart(data,chart) {
 	const ctx = document.getElementById('myChart').getContext('2d');
+
 
 	// Species labels based on the logic in the R code
 	const speciesLabels = data.map((item,idx) =>
@@ -82,6 +83,7 @@ chart = new Chart(ctx, {
 		],
 	},
 	options: {
+	
 		maintainAspectRatio:false,
 		scales: {
 			x: {
@@ -131,7 +133,9 @@ chart = new Chart(ctx, {
 				},
 			},
 		},
+		
 		plugins: {
+		
 			legend: {
 				display: true,
 				labels: {
