@@ -6,12 +6,12 @@
 	import diskChart from '$lib/ts/disk_plot';
 	import StripChart from '$lib/ts/strip_plot';
 	import Chart from 'chart.js/auto';
-	import '$lib/css/dashboard.css'
 	let dataFile: File | null = null;
 	let refFile: File | null = null;
-	let dataType: string = 'Strip'; // Default to 'Disk'
+	let dataType: string = 'Disk'; // Default to 'Disk'
 	let antiType: string = '';
 	let errorMsg: string = '';
+	let count: string = '';
 
 	let plotFiles: { name: string }[] = [];
 	let selectedPlot: string = ''; //TODO
@@ -21,15 +21,40 @@
 	plotFiles = [{ name: 'E-test' }, { name: 'MTS' }]; //TODO
 	selectedPlot = 'E-test';
 	antiType = 'linezolid10';
-	dir = '20240905120912'; //TODO
-	//plotFiles = [{ name: 'BD' }, { name: 'Oxoid' }, { name: 'Mast' }]; //TODO
-	//selectedPlot = 'Oxoid';
+	dir = '20240904213141'; //TODO
+	plotFiles = [{ name: 'BD' }, { name: 'Oxoid' }, { name: 'Mast' }]; //TODO
+	selectedPlot = 'Oxoid';
+
+	function findMostFrequent(arr) {
+		const frequencyMap = {};
+
+		arr.forEach((item) => {
+			const countValue = item.count;
+
+			frequencyMap[countValue] = (frequencyMap[countValue] || 0) + 1;
+		});
+
+		let mostFrequent = '';
+		let maxCount = 0;
+
+		for (let countValue in frequencyMap) {
+			if (frequencyMap[countValue] > maxCount) {
+				maxCount = frequencyMap[countValue];
+
+				mostFrequent = countValue;
+			}
+		}
+
+		return mostFrequent;
+	}
+
 	onMount(() => {
 		chart = Chart.getChart('myChart');
 		if (chart) chart.destroy();
 
 		chgData();
 	});
+
 	function handleDataFileChange(event: Event) {
 		const target = event.target as HTMLInputElement;
 		if (target.files) {
@@ -80,8 +105,10 @@
 	async function chgData() {
 		try {
 			const response = await getData(dataType, dir, antiType, selectedPlot);
-			if (dataType == 'Disk') diskChart(response, chart);
-			else StripChart(response, chart);
+			count = findMostFrequent(response);
+			console.log('=====', count);
+			if (dataType == 'Disk') diskChart(response, chart, count);
+			else StripChart(response, chart, count);
 		} catch (error) {
 			console.error('Upload failed:', error);
 			errorMsg = 'File upload failed. Please try again.';
@@ -97,14 +124,13 @@
 		}
 	}
 
-	function downloadPlot(){
+	function downloadPlot() {
 		const image = Chart.getChart('myChart').toBase64Image();
-				
-                const link = document
-                    .createElement('a');
-                link.href = image;
-                link.download = `${dir}_${selectedPlot}_${antiType}.jpg`;
-                link.click();
+
+		const link = document.createElement('a');
+		link.href = image;
+		link.download = `${dir}_${selectedPlot}_${antiType}.jpg`;
+		link.click();
 	}
 </script>
 
@@ -175,12 +201,12 @@
 
 		{#if selectedPlot}
 			<div class="mt-4 plot-container">
-				<h2>Plot for {selectedPlot}</h2>
+				<h2>Plot for {selectedPlot} (n={count})</h2>
 				<button class="col-3 justify-content-end btn btn-primary mb-5" on:click={downloadPlot}
-			>Download</button
-		>
+					>Download</button
+				>
 				<div class="chart-container">
-					<canvas id="myChart" ></canvas>
+					<canvas id="myChart"></canvas>
 				</div>
 			</div>
 		{/if}

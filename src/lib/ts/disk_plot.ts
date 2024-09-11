@@ -1,6 +1,6 @@
 import Chart from 'chart.js/auto';
 
-export default function (chartData: Array, chart: any) {
+export default function (chartData: Array, chart: any,count:string) {
 	const ctx = document.getElementById('myChart').getContext('2d');
 
 	chartData = chartData.filter((item) => {
@@ -115,7 +115,7 @@ export default function (chartData: Array, chart: any) {
 				},
 				y: {
 					reverse:true,
-					labels: strainNumbers,
+					// labels: strainNumbers,
 					max:strainNumbers.length,
 					min:1,
 					ticks: {
@@ -123,8 +123,13 @@ export default function (chartData: Array, chart: any) {
 						stepSize: 1
 					},
 					afterTickToLabelConversion: function(scaleInstance) { 
-						scaleInstance.ticks.forEach((tick,idx )=> { 
-							tick.label = strainNumbers[idx];
+						scaleInstance.ticks.forEach((tick )=> { 
+							const idx = chartData.findIndex((i)=> i.Strain_no == tick.label);
+							if(idx>-1){
+								const target = chartData[idx];
+								tick.label =`${target.Strain_no} ${target.count == count ? '' : `(n=${target.count})`}`;
+							
+							}
 						});
 						},
 					// type: 'category',
@@ -135,6 +140,7 @@ export default function (chartData: Array, chart: any) {
 				}
 			},
 			plugins: {
+				
 				legend: {
 					display: true,
 					labels: {

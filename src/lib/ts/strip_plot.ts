@@ -1,6 +1,6 @@
 import Chart from 'chart.js/auto';
 
-export default function StripChart(data,chart) {
+export default function StripChart(data,chart,count:string) {
 	const ctx = document.getElementById('myChart').getContext('2d');
 
 
@@ -120,8 +120,11 @@ chart = new Chart(ctx, {
 						const idx = data.findIndex((i)=> i.Strain_no == tick.value);
 						if(idx>-1){
 							const target = data[idx];
-							tick.label = target.Species == '1' ? `${target.Strain_no} faecalis(n=${target.count})` : `${target.Strain_no} faecium(n=${target.count})`;
-
+						
+							tick.label = target.Species == '1' 
+							? `${target.Strain_no} faecalis${target.count == count ? '' : `(n=${target.count})`}` 
+							: `${target.Strain_no} faecium ${target.count == count ? '' : `(n=${target.count})`}`;
+						
 						}
 						return; 
 					});
